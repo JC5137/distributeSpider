@@ -23,6 +23,9 @@ DUPEFILTER_CLASS = "scrapy_redis.dupefilter.RFPDupeFilter"
 #SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderQueue"
 #SCHEDULER_QUEUE_CLASS = "scrapy_redis.queue.SpiderStack"
 
+# Don't cleanup redis queues, allows to pause/resume crawls.
+SCHEDULER_PERSIST = True
+
 USER_AGENTS = [
     "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; AcooBrowser; .NET CLR 1.1.4322; .NET CLR 2.0.50727)",
     "Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Acoo Browser; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506)",
@@ -49,7 +52,7 @@ USER_AGENTS = [
 ROBOTSTXT_OBEY = True
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-#CONCURRENT_REQUESTS = 32
+CONCURRENT_REQUESTS = 32
 
 # Configure a delay for requests for the same website (default: 0)
 # See http://scrapy.readthedocs.org/en/latest/topics/settings.html#download-delay
@@ -103,11 +106,11 @@ ITEM_PIPELINES = {
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
-#AUTOTHROTTLE_ENABLED = True
+# AUTOTHROTTLE_ENABLED = True
 # The initial download delay
-#AUTOTHROTTLE_START_DELAY = 5
+# AUTOTHROTTLE_START_DELAY = 3
 # The maximum download delay to be set in case of high latencies
-#AUTOTHROTTLE_MAX_DELAY = 60
+# AUTOTHROTTLE_MAX_DELAY = 60
 # The average number of requests Scrapy should be sending in parallel to
 # each remote server
 #AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
@@ -121,18 +124,27 @@ ITEM_PIPELINES = {
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
-# start MySQL database configure setting
-MYSQL_HOST = 'localhost'
-MYSQL_DBNAME = 'literaturebooks_distribute'
-MYSQL_USER = 'root'
-MYSQL_PASSWD = 'jiangchuan'
-# end of MySQL database configure setting
-REDIS_HOST = 'localhost'
-REDIS_PORT = '6379'
 
-SLAVES = ['AmzonSlave1',
-          'AmzonSlave2',
-         ]
+# start MySQL database configure setting
+MYSQL_HOST = '#'
+MYSQL_DBNAME = 'literaturebooks_distribute'
+MYSQL_USER = '#'
+MYSQL_PASSWD = '#'
+# end of MySQL database configure setting
+
+# start Redis configure setting
+MYREDIS_HOST = '#'
+MYREDIS_PASSWORD = '#'
+MYREDIS_PORT = '6379'
+REDIS_URL = 'redis://#:#@#:6379'
+# end Redis configure setting
+
+LOG_ENABLED = True
+LOG_ENCODING = 'utf-8'
+LOG_FILE = 'LiteratureBooksLog'
+LOG_LEVEL = 'DEBUG'
+
+DNSCACHE_ENABLED = True
 
 
 

@@ -18,12 +18,14 @@ class LiteraturebooksItem(scrapy.Item):
     book_price_amzon = scrapy.Field()
     book_url_amzon = scrapy.Field()
     book_id_amzon = scrapy.Field()
+
 class JdBooksItem(scrapy.Item):
     book_name = scrapy.Field()
     book_id_amzon = scrapy.Field()
     book_url_jd = scrapy.Field()
     book_comments_num_jd = scrapy.Field()
     book_price_jd = scrapy.Field()
+
 # class LiteraturebooksLoader(ItemLoader):
     # default_item_class = LiteraturebooksItem
     # default_input_processor = MapCompose(lambda s: s.strip())

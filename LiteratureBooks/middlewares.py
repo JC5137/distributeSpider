@@ -4,9 +4,8 @@
 #
 # See documentation in:
 # http://doc.scrapy.org/en/latest/topics/spider-middleware.html
-
-from scrapy import signals
 import random
+from scrapy import signals
 from settings import USER_AGENTS
 
 class RandomUserAgentMiddleware(object):
@@ -14,6 +13,7 @@ class RandomUserAgentMiddleware(object):
         user_agent = random.choice(USER_AGENTS)
         if user_agent:
             request.headers.setdefault("User-Agent", user_agent)
+
 class LiteraturebooksSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
     # scrapy acts as if the spider middleware does not modify the

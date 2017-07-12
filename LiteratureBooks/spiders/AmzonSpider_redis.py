@@ -1,10 +1,11 @@
-﻿from scrapy.spiders import Rule
-from scrapy.linkextractors import LinkExtractor
-from scrapy_redis.spiders import RedisCrawlSpider
+﻿#coding:utf-8
+import random
 from LiteratureBooks.spiders import MyRedis
 from LiteratureBooks.spiders.MyRedis import *
-import random
-
+from scrapy.spiders import Rule
+from scrapy.linkextractors import LinkExtractor
+from scrapy_redis.spiders import RedisCrawlSpider
+from scrapy import Request
 
 
 class AmzonSpider(RedisCrawlSpider):
@@ -17,13 +18,20 @@ class AmzonSpider(RedisCrawlSpider):
         domain = kwargs.pop('domain', '')
         self.allowed_domains = filter(None, domain.split(','))
         super(AmzonSpider, self).__init__(*args, **kwargs)
+        print args
+        print kwargs
         self.redis_server = get_redis()
-        self.website_domin = "https://www.amazon.cn"
-
+        self.amzon_website_domin = "https://www.amazon.cn"
+    
+    #解析文学图书所有分类url
     def parse(self, response):
         classfication_link = response.xpath("//div[@class='left_nav browseBox']/ul[2]/li/a/@href").extract()
-        for link in self.get_link(classfication_link[0:2]):
-            self.redis_server.lpush('AmzonSlaver:start_urls',self.website_domin + link)          
-    def get_link(self,linkset):
-        for link in linkset:
-            yield link
+        for link in classfication_link:
+            yield Request(self.amzon_website_domin + link,callback=self.parse_url)
+    
+    #获取图像视图,解析url进入AmzonSlaver队列
+    def parse_url(self, response):
+        image_view = u'图像视图'
+        image_url = response.xpath(u"//a[@title='%s']/@href" %image_view).extract()
+        if image_url != []:
+            self.redis_server.lpush('AmzonSlaver:start_urls',self.amzon_website_domin + image_url[0])

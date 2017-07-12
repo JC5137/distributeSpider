@@ -5,15 +5,16 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: http://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
-from scrapy import log
-from twisted.enterprise import adbapi
-from datetime import datetime
 import MySQLdb
 import MySQLdb.cursors
+import logging
+from twisted.enterprise import adbapi
+
 
 class LiteraturebooksPipeline(object):
     def __init__(self,dbpool):
         self.dbpool = dbpool
+    
     @classmethod
     def from_settings(cls, settings):
         mysql_args = dict(
@@ -27,6 +28,7 @@ class LiteraturebooksPipeline(object):
         )
         dbpool = adbapi.ConnectionPool('MySQLdb', **mysql_args)
         return cls(dbpool)
+    
     #pipeline默认调用
     def process_item(self, item, spider):
         if "Amzon" in spider.name:
@@ -39,7 +41,8 @@ class LiteraturebooksPipeline(object):
             d.addErrback(self._handle_error, item, spider)
             d.addBoth(lambda _: item)
             return d 
-    #将每行更新或写入数据库中
+    
+    #写入数据库
     def _do_insert(self, conn, item, spider):
         parms = (item["book_id_amzon"],item["book_url_amzon"],item['book_name'],item['book_comments_num_amzon'],item['book_price_amzon'])
         sql = """insert into book_info 
@@ -50,7 +53,10 @@ class LiteraturebooksPipeline(object):
                  book_price_amzon
                 )
                 values ('%s','%s','%s',%d,'%s')""" %parms
+        print sql
         conn.execute(sql)
+    
+    #更新数据库
     def _do_update(self, conn, item, spider):
         parms = (item["book_url_jd"],item["book_comments_num_jd"],item["book_price_jd"],item["book_name"],item["book_id_amzon"])
         sql = """update book_info set
@@ -60,6 +66,8 @@ class LiteraturebooksPipeline(object):
                  where book_name = '%s' and book_id_amzon = '%s'""" %parms
         print sql
         conn.execute(sql)
+    
     #异常处理
     def _handle_error(self, failue, item, spider):
-        log.error(failure)
+        logger = logging.getLogger("DB")
+        logger.error(failure)

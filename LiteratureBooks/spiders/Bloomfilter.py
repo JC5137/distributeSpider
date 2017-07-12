@@ -1,7 +1,7 @@
 # encoding=utf-8
 # reference: http://blog.csdn.net/bone_ace/article/details/53107018
-import redis
 from hashlib import md5
+from MyRedis import get_redis
 
 
 class SimpleHash(object):
@@ -13,23 +13,24 @@ class SimpleHash(object):
         for i in range(len(value)):
             ret += self.seed * ret + ord(value[i])
         return (self.cap - 1) & ret
+
 class BloomFilter(object):
-    def __init__(self, host='localhost', port=6379, db=0, blockNum= 1, key='bloomfilter'):
+    def __init__(self, blockNum= 1, key='bloomfilter'):
         """
         :param host: the host of Redis
         :param port: the port of Redis
         :param db: witch db in Redis
-        :param blockNum: one blockNum for about 90,000,000; if you have more strings for filtering, increase it.
         :param key: the key's name in Redis
         """
-        self.server = redis.Redis(host=host, port=port, db=db)
-        self.bit_size = 1 << 31  #Redis的String类型最大容量为512M，现使用256M
+        self.server = get_redis()
+        self.bit_size = 1 << 16  #Redis的String类型最大容量为512M，现使用8K
         self.seeds = [5, 7, 11, 13, 31, 37, 61]
         self.key = key
         self.blockNum = blockNum
         self.hashfunc = []
         for seed in self.seeds:
             self.hashfunc.append(SimpleHash(self.bit_size, seed))
+    
     def is_contains(self, str_input):
         if not str_input:
             return False
@@ -52,9 +53,10 @@ class BloomFilter(object):
         return md5(str_input).hexdigest()
 
 if __name__ == '__main__':
-# 第一次运行时会显示 not exists!，之后再运行会显示 exists!
+    # 第一次运行时会显示 not exists!，之后再运行会显示 exists!
     bf = BloomFilter()
-    if bf.is_contains('http://www.baidu.com'):   # 判断字符串是否存在
+    str = '//item.jd.com/11291428.html' + '￥18.3'
+    if bf.is_contains(str):   # 判断字符串是否存在
         print 'exists!'
     else:
         print 'not exists!'
