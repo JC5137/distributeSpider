@@ -46,7 +46,7 @@ class AmzonSpider(RedisCrawlSpider):
         if result_start > result_count:
             return
         
-        #数据解析，遍历整个结果页，获取图书url、图书ID、图书名称、评论数、价格区间（注:需求无说明采集图书哪种价格）
+        #数据解析，遍历整个结果页，获取图书url、图书ID、图书名称、评论数、价格区间
         for result_id in xrange(result_start,result_count):
             try:
                 item = LiteraturebooksItem()
